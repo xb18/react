@@ -11,14 +11,7 @@
  */
 
 "use strict";
-var dynamicFeatureFlags = require("ReactFeatureFlags"),
-  enableTransitionTracing = dynamicFeatureFlags.enableTransitionTracing,
-  renameElementSymbol = dynamicFeatureFlags.renameElementSymbol,
-  enableViewTransition = dynamicFeatureFlags.enableViewTransition,
-  REACT_LEGACY_ELEMENT_TYPE = Symbol.for("react.element"),
-  REACT_ELEMENT_TYPE = renameElementSymbol
-    ? Symbol.for("react.transitional.element")
-    : REACT_LEGACY_ELEMENT_TYPE,
+var REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"),
   REACT_PORTAL_TYPE = Symbol.for("react.portal"),
   REACT_FRAGMENT_TYPE = Symbol.for("react.fragment"),
   REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode"),
@@ -88,7 +81,10 @@ assign(pureComponentPrototype, Component.prototype);
 pureComponentPrototype.isPureReactComponent = !0;
 var isArrayImpl = Array.isArray;
 function noop() {}
-var ReactSharedInternals = { H: null, A: null, T: null, S: null },
+var dynamicFeatureFlags = require("ReactFeatureFlags"),
+  enableTransitionTracing = dynamicFeatureFlags.enableTransitionTracing,
+  enableViewTransition = dynamicFeatureFlags.enableViewTransition,
+  ReactSharedInternals = { H: null, A: null, T: null, S: null },
   hasOwnProperty = Object.prototype.hasOwnProperty;
 function ReactElement(type, key, props) {
   var refProp = props.ref;
@@ -288,19 +284,27 @@ function mapChildren(children, func, context) {
 }
 function lazyInitializer(payload) {
   if (-1 === payload._status) {
-    var ctor = payload._result;
-    ctor = ctor();
-    ctor.then(
+    var ctor = payload._result,
+      thenable = ctor();
+    thenable.then(
       function (moduleObject) {
         if (0 === payload._status || -1 === payload._status)
-          (payload._status = 1), (payload._result = moduleObject);
+          (payload._status = 1),
+            (payload._result = moduleObject),
+            void 0 === thenable.status &&
+              ((thenable.status = "fulfilled"),
+              (thenable.value = moduleObject));
       },
       function (error) {
         if (0 === payload._status || -1 === payload._status)
-          (payload._status = 2), (payload._result = error);
+          (payload._status = 2),
+            (payload._result = error),
+            void 0 === thenable.status &&
+              ((thenable.status = "rejected"), (thenable.reason = error));
       }
     );
-    -1 === payload._status && ((payload._status = 0), (payload._result = ctor));
+    -1 === payload._status &&
+      ((payload._status = 0), (payload._result = thenable));
   }
   if (1 === payload._status) return payload._result.default;
   throw payload._result;
@@ -606,4 +610,4 @@ exports.useSyncExternalStore = function (
 exports.useTransition = function () {
   return ReactSharedInternals.H.useTransition();
 };
-exports.version = "19.3.0-www-classic-65eec428-20251218";
+exports.version = "19.3.0-www-classic-beef6d60-20260813";

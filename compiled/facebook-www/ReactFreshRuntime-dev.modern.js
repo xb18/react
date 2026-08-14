@@ -107,7 +107,6 @@ __DEV__ &&
       type = allSignaturesByType.get(type);
       void 0 !== type && computeFullKey(type);
     }
-    require("ReactFeatureFlags");
     var REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref"),
       REACT_MEMO_TYPE = Symbol.for("react.memo"),
       PossiblyWeakMap = "function" === typeof WeakMap ? WeakMap : Map,
@@ -275,7 +274,16 @@ __DEV__ &&
           updatedFamiliesByType.set(_ref, family);
           family.current = _ref;
           (prevType.prototype && prevType.prototype.isReactComponent) ||
-          (_ref.prototype && _ref.prototype.isReactComponent)
+          (_ref.prototype && _ref.prototype.isReactComponent) ||
+          typeof prevType !== typeof _ref ||
+          ("object" === typeof prevType &&
+            null !== prevType &&
+            null !== _ref &&
+            (getProperty(prevType, "$$typeof") !==
+              getProperty(_ref, "$$typeof") ||
+              (getProperty(prevType, "$$typeof") === REACT_MEMO_TYPE &&
+                (null === getProperty(prevType, "compare")) !==
+                  (null === getProperty(_ref, "compare")))))
             ? (_ref = !1)
             : ((prevType = allSignaturesByType.get(prevType)),
               (_ref = allSignaturesByType.get(_ref)),
