@@ -7,7 +7,7 @@
  * @noflow
  * @nolint
  * @preventMunge
- * @generated SignedSource<<ac8b6b5d8c050ca7565812132053c93d>>
+ * @generated SignedSource<<f5c76b75e895b58335bb25e60ca17a66>>
  */
 
 "use strict";
@@ -46,6 +46,7 @@ var Internals = {
     findDOMNode: null
   },
   REACT_PORTAL_TYPE = Symbol.for("react.portal"),
+  REACT_RECOVERABLE_TYPE = Symbol.for("react.recoverable"),
   REACT_OPTIMISTIC_KEY = Symbol.for("react.optimistic_key");
 function createPortal$1(children, containerInfo, implementation) {
   var key =
@@ -72,6 +73,9 @@ function getCrossOriginStringAs(as, input) {
 }
 exports.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE =
   Internals;
+exports.browser = function (reason) {
+  return { $$typeof: REACT_RECOVERABLE_TYPE, _reason: reason };
+};
 exports.createPortal = function (children, container) {
   var key =
     2 < arguments.length && void 0 !== arguments[2] ? arguments[2] : null;
@@ -146,7 +150,11 @@ exports.preinitModule = function (href, options) {
           crossOrigin: crossOrigin,
           integrity:
             "string" === typeof options.integrity ? options.integrity : void 0,
-          nonce: "string" === typeof options.nonce ? options.nonce : void 0
+          nonce: "string" === typeof options.nonce ? options.nonce : void 0,
+          fetchPriority:
+            "string" === typeof options.fetchPriority
+              ? options.fetchPriority
+              : void 0
         });
       }
     } else null == options && Internals.d.M(href);
@@ -193,7 +201,12 @@ exports.preloadModule = function (href, options) {
             : void 0,
         crossOrigin: crossOrigin,
         integrity:
-          "string" === typeof options.integrity ? options.integrity : void 0
+          "string" === typeof options.integrity ? options.integrity : void 0,
+        nonce: "string" === typeof options.nonce ? options.nonce : void 0,
+        fetchPriority:
+          "string" === typeof options.fetchPriority
+            ? options.fetchPriority
+            : void 0
       });
     } else Internals.d.m(href);
 };
@@ -209,4 +222,4 @@ exports.useFormState = function (action, initialState, permalink) {
 exports.useFormStatus = function () {
   return ReactSharedInternals.H.useHostTransitionStatus();
 };
-exports.version = "19.3.0-native-fb-65eec428-20251218";
+exports.version = "19.3.0-native-fb-beef6d60-20260813";

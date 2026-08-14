@@ -7,7 +7,7 @@
  * @noflow
  * @nolint
  * @preventMunge
- * @generated SignedSource<<bdab32bc15d279ef32866ad2541801dc>>
+ * @generated SignedSource<<fcaad0b1e8c62579ff3070826d76a535>>
  */
 
 "use strict";
@@ -15,12 +15,7 @@
   "function" ===
     typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart &&
   __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-var renameElementSymbol =
-    require("ReactNativeInternalFeatureFlags").renameElementSymbol,
-  REACT_LEGACY_ELEMENT_TYPE = Symbol.for("react.element"),
-  REACT_ELEMENT_TYPE = renameElementSymbol
-    ? Symbol.for("react.transitional.element")
-    : REACT_LEGACY_ELEMENT_TYPE,
+var REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"),
   REACT_PORTAL_TYPE = Symbol.for("react.portal"),
   REACT_FRAGMENT_TYPE = Symbol.for("react.fragment"),
   REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode"),
@@ -290,19 +285,27 @@ function mapChildren(children, func, context) {
 }
 function lazyInitializer(payload) {
   if (-1 === payload._status) {
-    var ctor = payload._result;
-    ctor = ctor();
-    ctor.then(
+    var ctor = payload._result,
+      thenable = ctor();
+    thenable.then(
       function (moduleObject) {
         if (0 === payload._status || -1 === payload._status)
-          (payload._status = 1), (payload._result = moduleObject);
+          (payload._status = 1),
+            (payload._result = moduleObject),
+            void 0 === thenable.status &&
+              ((thenable.status = "fulfilled"),
+              (thenable.value = moduleObject));
       },
       function (error) {
         if (0 === payload._status || -1 === payload._status)
-          (payload._status = 2), (payload._result = error);
+          (payload._status = 2),
+            (payload._result = error),
+            void 0 === thenable.status &&
+              ((thenable.status = "rejected"), (thenable.reason = error));
       }
     );
-    -1 === payload._status && ((payload._status = 0), (payload._result = ctor));
+    -1 === payload._status &&
+      ((payload._status = 0), (payload._result = thenable));
   }
   if (1 === payload._status) return payload._result.default;
   throw payload._result;
@@ -342,7 +345,39 @@ var reportGlobalError =
         }
         console.error(error);
       };
-function addTransitionType() {}
+function startTransition(scope) {
+  var prevTransition = ReactSharedInternals.T,
+    currentTransition = {};
+  currentTransition.types =
+    null !== prevTransition ? prevTransition.types : null;
+  ReactSharedInternals.T = currentTransition;
+  try {
+    var returnValue = scope(),
+      onStartTransitionFinish = ReactSharedInternals.S;
+    null !== onStartTransitionFinish &&
+      onStartTransitionFinish(currentTransition, returnValue);
+    "object" === typeof returnValue &&
+      null !== returnValue &&
+      "function" === typeof returnValue.then &&
+      returnValue.then(noop, reportGlobalError);
+  } catch (error) {
+    reportGlobalError(error);
+  } finally {
+    null !== prevTransition &&
+      null !== currentTransition.types &&
+      (prevTransition.types = currentTransition.types),
+      (ReactSharedInternals.T = prevTransition);
+  }
+}
+function addTransitionType(type) {
+  var transition = ReactSharedInternals.T;
+  if (null !== transition) {
+    var transitionTypes = transition.types;
+    null === transitionTypes
+      ? (transition.types = [type])
+      : -1 === transitionTypes.indexOf(type) && transitionTypes.push(type);
+  } else startTransition(addTransitionType.bind(null, type));
+}
 var ReactCompilerRuntime = { __proto__: null, c: useMemoCache },
   Children = {
     map: mapChildren,
@@ -492,28 +527,7 @@ exports.memo = function (type, compare) {
     compare: void 0 === compare ? null : compare
   };
 };
-exports.startTransition = function (scope) {
-  var prevTransition = ReactSharedInternals.T,
-    currentTransition = {};
-  ReactSharedInternals.T = currentTransition;
-  try {
-    var returnValue = scope(),
-      onStartTransitionFinish = ReactSharedInternals.S;
-    null !== onStartTransitionFinish &&
-      onStartTransitionFinish(currentTransition, returnValue);
-    "object" === typeof returnValue &&
-      null !== returnValue &&
-      "function" === typeof returnValue.then &&
-      returnValue.then(noop, reportGlobalError);
-  } catch (error) {
-    reportGlobalError(error);
-  } finally {
-    null !== prevTransition &&
-      null !== currentTransition.types &&
-      (prevTransition.types = currentTransition.types),
-      (ReactSharedInternals.T = prevTransition);
-  }
-};
+exports.startTransition = startTransition;
 exports.unstable_Activity = REACT_ACTIVITY_TYPE;
 exports.unstable_LegacyHidden = REACT_LEGACY_HIDDEN_TYPE;
 exports.unstable_Scope = REACT_SCOPE_TYPE;
@@ -590,7 +604,7 @@ exports.useSyncExternalStore = function (
 exports.useTransition = function () {
   return ReactSharedInternals.H.useTransition();
 };
-exports.version = "19.3.0-native-fb-65eec428-20251218";
+exports.version = "19.3.0-native-fb-beef6d60-20260813";
 "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ &&
   "function" ===
     typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop &&

@@ -7,16 +7,11 @@
  * @noflow
  * @nolint
  * @preventMunge
- * @generated SignedSource<<453945d75318f02d8ce69988b0dd882f>>
+ * @generated SignedSource<<217ca628de03dca3193eb5361aa84e57>>
  */
 
 "use strict";
-var renameElementSymbol =
-    require("ReactNativeInternalFeatureFlags").renameElementSymbol,
-  REACT_LEGACY_ELEMENT_TYPE = Symbol.for("react.element"),
-  REACT_ELEMENT_TYPE = renameElementSymbol
-    ? Symbol.for("react.transitional.element")
-    : REACT_LEGACY_ELEMENT_TYPE,
+var REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"),
   REACT_PORTAL_TYPE = Symbol.for("react.portal"),
   REACT_FRAGMENT_TYPE = Symbol.for("react.fragment"),
   REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode"),
@@ -121,6 +116,7 @@ exports.isValidElementType = function (type) {
     type === REACT_STRICT_MODE_TYPE ||
     type === REACT_SUSPENSE_TYPE ||
     type === REACT_SUSPENSE_LIST_TYPE ||
+    type === REACT_VIEW_TRANSITION_TYPE ||
     ("object" === typeof type &&
       null !== type &&
       (type.$$typeof === REACT_LAZY_TYPE ||
